@@ -1,5 +1,6 @@
 package ru.practicum.ewm.statsServer.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +18,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class StatsServiceImpl implements StatsService {
 
@@ -32,9 +34,9 @@ public class StatsServiceImpl implements StatsService {
     @Override
     @Transactional(readOnly = true)
     public List<ViewStatDto> findStatistic(String start, String end, List<String> uris, Boolean unique) {
-        LocalDateTime startDate = LocalDateTime.parse(URLDecoder.decode(start, StandardCharsets.UTF_8), FORMATTER);
-        LocalDateTime endDate = LocalDateTime.parse(URLDecoder.decode(end, StandardCharsets.UTF_8), FORMATTER);
         List<ViewStat> statList;
+        LocalDateTime startDate = dateDecoder(start);
+        LocalDateTime endDate = dateDecoder(end);
         if (uris == null) {
             if (unique) {
                 statList = statsRepository.findStatsBetweenStartAndEndAndUniqueIp(startDate, endDate);
@@ -48,13 +50,19 @@ public class StatsServiceImpl implements StatsService {
                 statList = statsRepository.findStatsBetweenStartAndEndByUri(startDate, endDate, uris);
             }
         }
+        log.info("StatsServer: data received and sent");
         return statList.stream().map(ViewStatMapper::toViewStatDto).collect(Collectors.toList());
     }
 
     @Override
     @Transactional
     public void saveInfoEvent(EndpointHitDto endpointHitDto) {
+        log.info("StatsServer: data saved in database");
         statsRepository.save(EndpointHitMapper.toEndpointHit(endpointHitDto));
+    }
+
+    private LocalDateTime dateDecoder(String date) {
+        return LocalDateTime.parse(URLDecoder.decode(date, StandardCharsets.UTF_8), FORMATTER);
     }
 
 }
