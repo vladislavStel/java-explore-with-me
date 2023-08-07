@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 @Service
 public class StatsServiceImpl implements StatsService {
 
-    DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     private final StatsRepository statsRepository;
 
@@ -32,8 +32,8 @@ public class StatsServiceImpl implements StatsService {
     @Override
     @Transactional(readOnly = true)
     public List<ViewStatDto> findStatistic(String start, String end, List<String> uris, Boolean unique) {
-        LocalDateTime startDate = LocalDateTime.parse(URLDecoder.decode(start, StandardCharsets.UTF_8), DATE_FORMATTER);
-        LocalDateTime endDate = LocalDateTime.parse(URLDecoder.decode(end, StandardCharsets.UTF_8), DATE_FORMATTER);
+        LocalDateTime startDate = LocalDateTime.parse(URLDecoder.decode(start, StandardCharsets.UTF_8), FORMATTER);
+        LocalDateTime endDate = LocalDateTime.parse(URLDecoder.decode(end, StandardCharsets.UTF_8), FORMATTER);
         List<ViewStat> statList;
         if (uris == null) {
             if (unique) {

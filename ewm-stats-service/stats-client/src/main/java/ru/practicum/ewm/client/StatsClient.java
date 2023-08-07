@@ -12,7 +12,7 @@ import ru.practicum.ewm.commonDto.dto.ViewStatDto;
 import java.util.*;
 
 @Service
-public class StatsClient{
+public class StatsClient {
 
     private static final String STATS_SERVER_URL = "http://stats-server:9090";
     private static final String PATH_HIT = "/hit";
