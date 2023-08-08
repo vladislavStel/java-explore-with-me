@@ -1,7 +1,7 @@
-package ru.practicum.ewm.statsServer.service;
+package ru.practicum.ewm.stats_server.service;
 
-import ru.practicum.ewm.commonDto.dto.EndpointHitDto;
-import ru.practicum.ewm.commonDto.dto.ViewStatDto;
+import ru.practicum.ewm.common_dto.EndpointHitDto;
+import ru.practicum.ewm.common_dto.ViewStatDto;
 
 import java.util.List;
 

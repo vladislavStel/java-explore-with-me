@@ -1,10 +1,10 @@
-package ru.practicum.ewm.statsServer.mapper;
+package ru.practicum.ewm.stats_server.mapper;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
-import ru.practicum.ewm.commonDto.dto.EndpointHitDto;
-import ru.practicum.ewm.statsServer.model.EndpointHit;
+import ru.practicum.ewm.common_dto.EndpointHitDto;
+import ru.practicum.ewm.stats_server.model.EndpointHit;
 
 @Component
 @NoArgsConstructor(access = AccessLevel.PRIVATE)

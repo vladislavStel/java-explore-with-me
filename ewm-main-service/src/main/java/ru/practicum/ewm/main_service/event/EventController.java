@@ -1,12 +1,12 @@
-package ru.practicum.ewm.mainService.Event.controller;
+package ru.practicum.ewm.main_service.event;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.practicum.ewm.client.StatsClient;
-import ru.practicum.ewm.commonDto.dto.EndpointHitDto;
-import ru.practicum.ewm.commonDto.dto.ViewStatDto;
+import ru.practicum.ewm.stats_client.client.StatsClient;
+import ru.practicum.ewm.common_dto.EndpointHitDto;
+import ru.practicum.ewm.common_dto.ViewStatDto;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;

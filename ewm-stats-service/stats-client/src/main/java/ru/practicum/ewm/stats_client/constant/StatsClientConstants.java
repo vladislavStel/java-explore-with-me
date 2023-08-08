@@ -1,8 +1,11 @@
-package ru.practicum.ewm.constant;
+package ru.practicum.ewm.stats_client.constant;
 
 import java.time.format.DateTimeFormatter;
 
-public class StatsClientConstants {
+public final class StatsClientConstants {
+
+    private StatsClientConstants() {
+    }
 
     public static final String STATS_SERVER_URL = "http://stats-server:9090";
     public static final String PATH_HIT = "/hit";

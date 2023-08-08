@@ -1,4 +1,4 @@
-package ru.practicum.ewm.statsServer.model;
+package ru.practicum.ewm.stats_server.model;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;

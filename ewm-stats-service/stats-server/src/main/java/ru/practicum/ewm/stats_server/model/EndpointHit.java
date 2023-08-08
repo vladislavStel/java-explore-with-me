@@ -1,4 +1,4 @@
-package ru.practicum.ewm.statsServer.model;
+package ru.practicum.ewm.stats_server.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;

@@ -1,4 +1,4 @@
-package ru.practicum.ewm.client;
+package ru.practicum.ewm.stats_client.client;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -8,8 +8,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
-import ru.practicum.ewm.commonDto.dto.EndpointHitDto;
-import ru.practicum.ewm.commonDto.dto.ViewStatDto;
+import ru.practicum.ewm.common_dto.EndpointHitDto;
+import ru.practicum.ewm.common_dto.ViewStatDto;
 
 import javax.validation.constraints.NotNull;
 import java.net.URLEncoder;
@@ -17,7 +17,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.*;
 
-import static ru.practicum.ewm.constant.StatsClientConstants.*;
+import static ru.practicum.ewm.stats_client.constant.StatsClientConstants.*;
 
 @Slf4j
 @Service
