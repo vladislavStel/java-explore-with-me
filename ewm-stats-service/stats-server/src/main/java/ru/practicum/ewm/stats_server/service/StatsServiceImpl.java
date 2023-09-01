@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.common_dto.EndpointHitDto;
 import ru.practicum.ewm.common_dto.ViewStatDto;
+import ru.practicum.ewm.stats_server.exception.ValidationException;
 import ru.practicum.ewm.stats_server.mapper.EndpointHitMapper;
 import ru.practicum.ewm.stats_server.mapper.ViewStatMapper;
 import ru.practicum.ewm.stats_server.model.ViewStat;
@@ -33,6 +34,9 @@ public class StatsServiceImpl implements StatsService {
         List<ViewStat> statList;
         LocalDateTime startDate = dateDecoder(start);
         LocalDateTime endDate = dateDecoder(end);
+        if (startDate.isAfter(endDate)) {
+            throw new ValidationException("Wrong date range.");
+        }
         if (uris == null) {
             if (unique) {
                 statList = statsRepository.findStatsBetweenStartAndEndAndUniqueIp(startDate, endDate);
