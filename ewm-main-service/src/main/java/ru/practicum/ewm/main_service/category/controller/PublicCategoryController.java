@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.main_service.category.dto.CategoryDto;
 import ru.practicum.ewm.main_service.category.service.CategoryService;
 
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 @Slf4j
@@ -19,8 +21,10 @@ public class PublicCategoryController {
     private final CategoryService categoryService;
 
     @GetMapping
-    public List<CategoryDto> getCategories(@RequestParam(name = "from", defaultValue = "0", required = false) int from,
-                                           @RequestParam(name = "size", defaultValue = "10", required = false) int size) {
+    public List<CategoryDto> getCategories(@RequestParam(defaultValue = "0", required = false)
+                                           @PositiveOrZero int from,
+                                           @RequestParam(defaultValue = "10", required = false)
+                                           @Positive int size) {
         log.info("MainService: Get categories, from={}, size={}", from, size);
         return categoryService.findCategories(from, size);
     }

@@ -8,12 +8,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
-import ru.practicum.ewm.main_service.exception.error.ConflictException;
-import ru.practicum.ewm.main_service.exception.error.IncorrectlyRequestException;
+import ru.practicum.ewm.main_service.exception.error.*;
 import ru.practicum.ewm.main_service.exception.model.ErrorResponse;
-import ru.practicum.ewm.main_service.exception.error.ObjectAlreadyExistException;
-import ru.practicum.ewm.main_service.exception.error.ObjectNotFoundException;
-import ru.practicum.ewm.main_service.exception.error.ValidationException;
 
 import javax.validation.ConstraintViolationException;
 import java.util.List;
@@ -23,13 +19,6 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class ErrorHandler {
 
-    @ExceptionHandler(ObjectAlreadyExistException.class)
-    @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse handleUserAlreadyExistException(Exception e) {
-        log.error(e.getMessage(), e);
-        return new ErrorResponse(HttpStatus.CONFLICT, e.getMessage());
-    }
-
     @ExceptionHandler(ObjectNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleObjectNotFoundExceptions(Exception e) {
@@ -37,39 +26,19 @@ public class ErrorHandler {
         return new ErrorResponse(HttpStatus.NOT_FOUND, e.getMessage());
     }
 
-    @ExceptionHandler(ConflictException.class)
+    @ExceptionHandler(InvalidRequestParameterException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
-    public ErrorResponse handleConflictException(Exception e) {
+    public ErrorResponse handleInvalidRequestParameterException(Exception e) {
         log.error(e.getMessage(), e);
         return new ErrorResponse(HttpStatus.FORBIDDEN, e.getMessage());
     }
 
-    @ExceptionHandler(ValidationException.class)
+    @ExceptionHandler({InvalidObjectStatusException.class,
+            CategoryNotEmptyException.class, ObjectAlreadyExistException.class})
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse handleValidationException(Exception e) {
+    public ErrorResponse handleConflictException(Exception e) {
         log.error(e.getMessage(), e);
         return new ErrorResponse(HttpStatus.CONFLICT, e.getMessage());
-    }
-
-    @ExceptionHandler(IncorrectlyRequestException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleIncorrectlyRequestException(Exception e) {
-        log.error(e.getMessage(), e);
-        return new ErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage());
-    }
-
-    @ExceptionHandler(IllegalArgumentException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleIllegalArgumentException(IllegalArgumentException e) {
-        log.error(e.getMessage(), e);
-        return new ErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage());
-    }
-
-    @ExceptionHandler(MissingServletRequestParameterException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleMissingServletRequestParameterException(MissingServletRequestParameterException e) {
-        log.error(e.getMessage(), e);
-        return new ErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -94,9 +63,10 @@ public class ErrorHandler {
                 .collect(Collectors.toList());
     }
 
-    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    @ExceptionHandler({MethodArgumentTypeMismatchException.class, IncorrectlyRequestException.class,
+            IllegalArgumentException.class, MissingServletRequestParameterException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleIncorrectlyMadeRequest(MethodArgumentTypeMismatchException e) {
+    public ErrorResponse handleIncorrectlyMadeRequest(Exception e) {
         log.error(e.getMessage(), e);
         return new ErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage());
     }

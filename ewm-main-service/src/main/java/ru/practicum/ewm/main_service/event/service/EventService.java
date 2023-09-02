@@ -5,6 +5,7 @@ import ru.practicum.ewm.main_service.event.enums.EventSort;
 import ru.practicum.ewm.main_service.event.model.Event;
 import ru.practicum.ewm.main_service.request.dto.ParticipationRequestDto;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
@@ -30,9 +31,10 @@ public interface EventService {
 
     List<EventShortDto> findEventsBySearchQueryAndSort(String text, List<Long> categories, Boolean paid,
                                                        LocalDateTime rangeStart, LocalDateTime rangeEnd,
-                                                       Boolean onlyAvailable, EventSort sort, int from, int size);
+                                                       Boolean onlyAvailable, EventSort sort, int from, int size,
+                                                       HttpServletRequest request);
 
-    EventFullDto findEventFullInfo(long id);
+    EventFullDto findEventFullInfo(long id, HttpServletRequest request);
 
     Event getEventById(Long eventId);
 

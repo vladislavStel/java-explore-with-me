@@ -17,10 +17,7 @@ import ru.practicum.ewm.main_service.event.mapper.EventMapper;
 import ru.practicum.ewm.main_service.event.model.Event;
 import ru.practicum.ewm.main_service.event.repository.EventRepository;
 import ru.practicum.ewm.main_service.event.repository.RepositorySearchOnCriteria;
-import ru.practicum.ewm.main_service.exception.error.ConflictException;
-import ru.practicum.ewm.main_service.exception.error.IncorrectlyRequestException;
-import ru.practicum.ewm.main_service.exception.error.ObjectNotFoundException;
-import ru.practicum.ewm.main_service.exception.error.ValidationException;
+import ru.practicum.ewm.main_service.exception.error.*;
 import ru.practicum.ewm.main_service.location.model.Location;
 import ru.practicum.ewm.main_service.location.service.LocationService;
 import ru.practicum.ewm.main_service.request.dto.ParticipationRequestDto;
@@ -34,6 +31,7 @@ import ru.practicum.ewm.main_service.user.service.UserService;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Tuple;
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -79,7 +77,7 @@ public class EventServiceImpl implements EventService {
             event.setRequestModeration(true);
         }
         if (!event.getEventDate().isAfter(LocalDateTime.now().plusHours(2))) {
-            throw new ConflictException("Field: eventDate. Error: must contain a date that has not yet arrived. " +
+            throw new InvalidRequestParameterException("Field: eventDate. Error: must contain a date that has not yet arrived. " +
                     "Value: " + event.getEventDate());
         }
         event.setState(EventState.PENDING);
@@ -105,7 +103,7 @@ public class EventServiceImpl implements EventService {
         User user = userService.findUserById(userId);
         Event event = addUpdatableFields(updateEvent, eventId);
         if (event.getState() == EventState.PUBLISHED) {
-            throw new ValidationException("Event must not be published");
+            throw new InvalidObjectStatusException("Event must not be published");
         }
         if (!Objects.equals(event.getInitiator(), user)) {
             throw new ObjectNotFoundException(String.format("User not found: id=%d", userId));
@@ -121,7 +119,7 @@ public class EventServiceImpl implements EventService {
     public List<ParticipationRequestDto> findEventsRequests(long userId, long eventId) {
         Event event = getEventById(eventId);
         if (event.getInitiator().getId() != userId) {
-            throw new ConflictException(String.format("User with id %d is not the initiator of event with id %d",
+            throw new InvalidRequestParameterException(String.format("User with id %d is not the initiator of event with id %d",
                     userId, eventId));
         }
         List<Request> requestList = requestRepository.findAllByEventId(eventId);
@@ -136,11 +134,11 @@ public class EventServiceImpl implements EventService {
                 .orElseThrow(() -> new IllegalArgumentException("Unknown status"));
 
         if (event.getInitiator().getId() != userId) {
-            throw new ConflictException(String.format("User with id %d is not the initiator of event with id %d",
+            throw new InvalidRequestParameterException(String.format("User with id %d is not the initiator of event with id %d",
                     userId, eventId));
         }
         if (event.getParticipantLimit() == 0 && !event.getRequestModeration()) {
-            throw new ConflictException(String.format("Event with id %d does not require requests to be approved",
+            throw new InvalidRequestParameterException(String.format("Event with id %d does not require requests to be approved",
                     event.getId()));
         }
 
@@ -154,7 +152,7 @@ public class EventServiceImpl implements EventService {
             }
             if (request.getStatus() != RequestStatus.PENDING) {
                 log.error("Request must have status PENDING");
-                throw new ValidationException("Request must have status PENDING");
+                throw new InvalidObjectStatusException("Request must have status PENDING");
             }
         });
 
@@ -163,7 +161,7 @@ public class EventServiceImpl implements EventService {
 
         if (status == RequestStatus.CONFIRMED) {
             if (numberConfirmedRequests >= event.getParticipantLimit()) {
-                throw new ValidationException("Event participant limit has ended");
+                throw new InvalidObjectStatusException("Event participant limit has ended");
             }
             int participantLimitRemainder = event.getParticipantLimit() - numberConfirmedRequests;
             if (participantLimitRemainder >= requestList.size()) {
@@ -212,7 +210,7 @@ public class EventServiceImpl implements EventService {
     public EventFullDto patchEventAdminRequest(long eventId, UpdateEvent updateEvent) {
         Event event = addUpdatableFields(updateEvent, eventId);
         if (!Objects.equals(event.getState(), EventState.PENDING)) {
-            throw new ValidationException("Cannot publish the event because it's not in the right state: " + event.getState());
+            throw new InvalidObjectStatusException("Cannot publish the event because it's not in the right state: " + event.getState());
         }
         if (updateEvent.getStateAction() != null) {
             if (updateEvent.getStateAction() == StateAction.PUBLISH_EVENT && event.getState() != EventState.PUBLISHED) {
@@ -229,7 +227,9 @@ public class EventServiceImpl implements EventService {
     @Override
     public List<EventShortDto> findEventsBySearchQueryAndSort(String text, List<Long> categories, Boolean paid,
                                                               LocalDateTime rangeStart, LocalDateTime rangeEnd,
-                                                              Boolean onlyAvailable, EventSort sort, int from, int size) {
+                                                              Boolean onlyAvailable, EventSort sort, int from, int size,
+                                                              HttpServletRequest request) {
+        statisticService.addHit(request);
         List<Event> result = criteria.searchEventsByQueryAndSort(text, categories, paid, rangeStart,
                 rangeEnd, sort, from, size);
         if (result.isEmpty()) {
@@ -252,7 +252,8 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public EventFullDto findEventFullInfo(long id) {
+    public EventFullDto findEventFullInfo(long id, HttpServletRequest request) {
+        statisticService.addHit(request);
         Event event = getEventById(id);
         if (event.getState() != EventState.PUBLISHED) {
             log.error("Trying to view unpublished event id {}", id);
@@ -276,7 +277,7 @@ public class EventServiceImpl implements EventService {
         Event event = getEventById(eventId);
         if (updateEvent.getEventDate() != null && !updateEvent.getEventDate()
                 .isAfter(event.getCreatedOn().plusHours(2))) {
-            throw new ConflictException("Field: eventDate. Error: must contain a date that has not yet arrived. " +
+            throw new InvalidRequestParameterException("Field: eventDate. Error: must contain a date that has not yet arrived. " +
                     "Value: " + updateEvent.getEventDate());
         }
         if (updateEvent.getTitle() != null) {

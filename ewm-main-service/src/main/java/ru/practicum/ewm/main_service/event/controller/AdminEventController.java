@@ -8,6 +8,7 @@ import ru.practicum.ewm.main_service.event.dto.EventFullDto;
 import ru.practicum.ewm.main_service.event.dto.UpdateEvent;
 import ru.practicum.ewm.main_service.event.service.EventService;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
@@ -31,7 +32,7 @@ public class AdminEventController {
                                                 @RequestParam(name = "rangeEnd", required = false)
                                                 @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeEnd,
                                                 @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
-                                                @Positive @RequestParam(defaultValue = "10") Integer size) {
+                                                @Positive @RequestParam(defaultValue = "10") Integer size, HttpServletRequest request) {
         log.info("MainService: Get Admin all events, " +
                 "users={}, states={}, categories={}, rangeStart={}, rangeEnd={}, from={}, size={}",
                 users, states, categories, rangeStart, rangeEnd, from, size);

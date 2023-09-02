@@ -13,9 +13,9 @@ import ru.practicum.ewm.main_service.category.mapper.CategoryMapper;
 import ru.practicum.ewm.main_service.category.model.Category;
 import ru.practicum.ewm.main_service.category.repository.CategoryRepository;
 import ru.practicum.ewm.main_service.event.repository.EventRepository;
+import ru.practicum.ewm.main_service.exception.error.CategoryNotEmptyException;
 import ru.practicum.ewm.main_service.exception.error.ObjectAlreadyExistException;
 import ru.practicum.ewm.main_service.exception.error.ObjectNotFoundException;
-import ru.practicum.ewm.main_service.exception.error.ValidationException;
 
 import java.util.List;
 import java.util.Objects;
@@ -46,7 +46,7 @@ public class CategoryServiceImpl implements CategoryService {
     public void deleteCategoryById(long catId) {
         validateCategoryById(catId);
         if (eventRepository.countEventByCategoryId(catId) > 0) {
-            throw new ValidationException(String.format("The category with ID=%d is not empty", catId));
+            throw new CategoryNotEmptyException(String.format("The category with ID=%d is not empty", catId));
         }
         categoryRepository.deleteById(catId);
         log.info("Category deleted by id={}", catId);

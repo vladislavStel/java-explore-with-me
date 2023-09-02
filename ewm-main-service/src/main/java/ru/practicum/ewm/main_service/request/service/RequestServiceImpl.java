@@ -8,9 +8,9 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.main_service.event.enums.EventState;
 import ru.practicum.ewm.main_service.event.model.Event;
 import ru.practicum.ewm.main_service.event.service.EventService;
+import ru.practicum.ewm.main_service.exception.error.InvalidObjectStatusException;
 import ru.practicum.ewm.main_service.exception.error.ObjectAlreadyExistException;
 import ru.practicum.ewm.main_service.exception.error.ObjectNotFoundException;
-import ru.practicum.ewm.main_service.exception.error.ValidationException;
 import ru.practicum.ewm.main_service.request.dto.ParticipationRequestDto;
 import ru.practicum.ewm.main_service.request.enums.RequestStatus;
 import ru.practicum.ewm.main_service.request.mapper.RequestMapper;
@@ -47,10 +47,10 @@ public class RequestServiceImpl implements RequestService {
         User requester = userService.findUserById(userId);
         Event event = eventService.getEventById(eventId);
         if (!Objects.equals(event.getState(), EventState.PUBLISHED)) {
-            throw new ValidationException("Cannot create request, event not published, eventId: " + eventId);
+            throw new InvalidObjectStatusException("Cannot create request, event not published, eventId: " + eventId);
         }
         if (Objects.equals(event.getInitiator(), requester)) {
-            throw new ValidationException("You cannot create a request in your event, eventId: " + eventId);
+            throw new InvalidObjectStatusException("You cannot create a request in your event, eventId: " + eventId);
         }
         Request request = Request.builder()
                 .requester(requester)
@@ -64,7 +64,7 @@ public class RequestServiceImpl implements RequestService {
         }
         Integer countRequests = requestRepository.countRequestsByEventIdAndStatus(eventId, RequestStatus.CONFIRMED);
         if (event.getParticipantLimit() != 0 && countRequests >= event.getParticipantLimit()) {
-            throw new ValidationException("Event participant limit has ended");
+            throw new InvalidObjectStatusException("Event participant limit has ended");
         }
         try {
             log.info("Save request in the repository, request={}", request);
@@ -81,7 +81,7 @@ public class RequestServiceImpl implements RequestService {
         Request request = requestRepository.findById(requestId).orElseThrow(() ->
                 new ObjectNotFoundException(String.format("Request not found: id=%d", requestId)));
         if (!Objects.equals(request.getRequester().getId(), userId)) {
-            throw new ValidationException(String.format("Editing request with id %d is not available" +
+            throw new InvalidObjectStatusException(String.format("Editing request with id %d is not available" +
                     " for user with id %d", requestId, userId));
         }
         request.setStatus(RequestStatus.CANCELED);
