@@ -193,9 +193,8 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public List<EventFullDto> findAllEvents(List<Long> users, List<String> states, List<Long> categories,
-                                            LocalDateTime rangeStart, LocalDateTime rangeEnd, Integer from, Integer size) {
-        List<Event> result = criteria.searchAllEvents(users, states, categories, rangeStart, rangeEnd, from, size);
+    public List<EventFullDto> findAllEvents(SearchCriteriaObject searchCriteriaObject) {
+        List<Event> result = criteria.searchAllEvents(searchCriteriaObject);
         if (result.isEmpty()) {
             return Collections.emptyList();
         } else {
@@ -225,25 +224,22 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public List<EventShortDto> findEventsBySearchQueryAndSort(String text, List<Long> categories, Boolean paid,
-                                                              LocalDateTime rangeStart, LocalDateTime rangeEnd,
-                                                              Boolean onlyAvailable, EventSort sort, int from, int size,
+    public List<EventShortDto> findEventsBySearchQueryAndSort(SearchCriteriaObject searchCriteriaObject,
                                                               HttpServletRequest request) {
         statisticService.addHit(request);
-        List<Event> result = criteria.searchEventsByQueryAndSort(text, categories, paid, rangeStart,
-                rangeEnd, sort, from, size);
+        List<Event> result = criteria.searchEventsByQueryAndSort(searchCriteriaObject);
         if (result.isEmpty()) {
             return Collections.emptyList();
         }
         addViewsByStatisticService(result);
         addConfirmedRequests(result);
 
-        if (onlyAvailable && sort == EventSort.VIEWS) {
+        if (searchCriteriaObject.getOnlyAvailable() && searchCriteriaObject.getSort() == EventSort.VIEWS) {
             result = result.stream()
                     .filter(event -> event.getConfirmedRequests() < event.getParticipantLimit())
                     .sorted(Comparator.comparingLong(Event::getViews).reversed())
                     .collect(Collectors.toList());
-        } else if (!onlyAvailable && sort == EventSort.VIEWS) {
+        } else if (!searchCriteriaObject.getOnlyAvailable() && searchCriteriaObject.getSort() == EventSort.VIEWS) {
             result = result.stream()
                     .sorted(Comparator.comparingLong(Event::getViews).reversed())
                     .collect(Collectors.toList());
