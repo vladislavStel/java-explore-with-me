@@ -1,7 +1,11 @@
 package ru.practicum.ewm.main_service.event.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import ru.practicum.ewm.main_service.category.dto.CategoryDto;
 import ru.practicum.ewm.main_service.event.enums.EventState;
@@ -14,8 +18,8 @@ import java.time.LocalDateTime;
 @Builder
 @EqualsAndHashCode
 @AllArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE)
-public class EventFullDto {
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+public final class EventFullDto {
 
     long id;
     String title;

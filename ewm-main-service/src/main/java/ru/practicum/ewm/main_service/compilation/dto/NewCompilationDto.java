@@ -1,6 +1,10 @@
 package ru.practicum.ewm.main_service.compilation.dto;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 
 import javax.validation.constraints.NotBlank;
@@ -12,8 +16,8 @@ import java.util.List;
 @Builder
 @EqualsAndHashCode
 @AllArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE)
-public class NewCompilationDto {
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+public final class NewCompilationDto {
 
     boolean pinned;
     @NotBlank

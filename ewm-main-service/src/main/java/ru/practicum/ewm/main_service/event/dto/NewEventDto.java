@@ -1,13 +1,18 @@
 package ru.practicum.ewm.main_service.event.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.sun.istack.NotNull;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import ru.practicum.ewm.main_service.location.model.Location;
 
 import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 
@@ -15,9 +20,9 @@ import java.time.LocalDateTime;
 @Builder
 @EqualsAndHashCode
 @AllArgsConstructor
-@NoArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE)
-public class NewEventDto {
+@NoArgsConstructor(force = true)
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+public final class NewEventDto {
 
     @NotBlank
     @Size(min = 20, max = 2000)

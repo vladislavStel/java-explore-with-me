@@ -32,12 +32,13 @@ public class CompilationMapper {
     public static CompilationDto toCompilationDto(Compilation compilation, Set<Event> events) {
         Set<EventShortDto> eventShortDtoList = events.stream().map(EventMapper::toEventShortDto)
                 .collect(Collectors.toSet());
-        return CompilationDto.builder()
+        CompilationDto compilationDto = CompilationDto.builder()
                 .id(compilation.getId())
                 .title(compilation.getTitle())
                 .pinned(compilation.isPinned())
-                .events(eventShortDtoList)
                 .build();
+        compilationDto.getEvents().addAll(eventShortDtoList);
+        return compilationDto;
     }
 
     public static List<CompilationDto> toCompilationDtoList(List<Compilation> compilations,
@@ -52,19 +53,20 @@ public class CompilationMapper {
                     Set<EventShortDto> eventShortDtoForCompilation =
                             compilation.getEvents().stream()
                                     .map(event -> eventDtoByEventIds.get(event.getId())).collect(Collectors.toSet());
-                    compilationDto.setEvents(eventShortDtoForCompilation);
+                    compilationDto.getEvents().addAll(eventShortDtoForCompilation);
                     return compilationDto;
                 })
                 .collect(Collectors.toList());
     }
 
     public static CompilationDto toEmptyCompilationDto(Compilation compilation) {
-        return CompilationDto.builder()
+        CompilationDto compilationDto = CompilationDto.builder()
                 .id(compilation.getId())
                 .title(compilation.getTitle())
                 .pinned(compilation.isPinned())
-                .events(Collections.emptySet())
                 .build();
+        compilationDto.getEvents().addAll(Collections.emptySet());
+        return compilationDto;
     }
 
 }
