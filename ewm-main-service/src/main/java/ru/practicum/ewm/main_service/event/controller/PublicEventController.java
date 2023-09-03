@@ -2,13 +2,17 @@ package ru.practicum.ewm.main_service.event.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.ewm.main_service.event.dto.EventFullDto;
 import ru.practicum.ewm.main_service.event.dto.EventShortDto;
 import ru.practicum.ewm.main_service.event.dto.SearchCriteriaObject;
 import ru.practicum.ewm.main_service.event.service.EventService;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.util.List;
 
 @Slf4j
@@ -20,7 +24,7 @@ public class PublicEventController {
     private final EventService eventService;
 
     @GetMapping
-    public List<EventShortDto> getEventsBySearchQueryAndSort(SearchCriteriaObject searchCriteriaObject,
+    public List<EventShortDto> getEventsBySearchQueryAndSort(@Valid SearchCriteriaObject searchCriteriaObject,
                                                              HttpServletRequest request) {
         log.info("MainService: Get events by search query");
         return eventService.findEventsBySearchQueryAndSort(searchCriteriaObject, request);

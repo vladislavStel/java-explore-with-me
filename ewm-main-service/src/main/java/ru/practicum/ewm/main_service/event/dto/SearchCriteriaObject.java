@@ -1,8 +1,13 @@
 package ru.practicum.ewm.main_service.event.dto;
 
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.FieldDefaults;
-import org.hibernate.validator.constraints.Length;
 import org.springframework.format.annotation.DateTimeFormat;
 import ru.practicum.ewm.main_service.event.enums.EventSort;
 
@@ -20,7 +25,6 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class SearchCriteriaObject {
 
-    @Length(min = 3)
     String text;
     List<Long> users;
     List<String> states;

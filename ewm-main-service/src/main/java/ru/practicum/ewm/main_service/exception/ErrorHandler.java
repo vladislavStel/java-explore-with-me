@@ -8,7 +8,12 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
-import ru.practicum.ewm.main_service.exception.error.*;
+import ru.practicum.ewm.main_service.exception.error.CategoryNotEmptyException;
+import ru.practicum.ewm.main_service.exception.error.IncorrectlyRequestException;
+import ru.practicum.ewm.main_service.exception.error.InvalidObjectStatusException;
+import ru.practicum.ewm.main_service.exception.error.InvalidRequestParameterException;
+import ru.practicum.ewm.main_service.exception.error.ObjectAlreadyExistException;
+import ru.practicum.ewm.main_service.exception.error.ObjectNotFoundException;
 import ru.practicum.ewm.main_service.exception.model.ErrorResponse;
 
 import javax.validation.ConstraintViolationException;

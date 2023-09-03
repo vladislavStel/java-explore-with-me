@@ -18,7 +18,10 @@ import ru.practicum.ewm.main_service.event.service.EventService;
 import ru.practicum.ewm.main_service.exception.error.ObjectAlreadyExistException;
 import ru.practicum.ewm.main_service.exception.error.ObjectNotFoundException;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
