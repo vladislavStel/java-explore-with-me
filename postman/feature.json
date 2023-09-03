@@ -718,95 +718,6 @@
 					"name": "Required params in body",
 					"item": [
 						{
-							"name": "Изменение категории с некорректным body",
-							"event": [
-								{
-									"listen": "prerequest",
-									"script": {
-										"exec": [
-											"const main = async () => {\r",
-											"    const api = new API(pm);\r",
-											"    const rnd = new RandomUtils();\r",
-											"    let category\r",
-											"    try {\r",
-											"        category = await api.addCategory(rnd.getCategory());\r",
-											"        pm.collectionVariables.set(\"catid\", category.id)\r",
-											"    } catch(err) {\r",
-											"        console.error(\"Ошибка при подготовке тестовых данных.\", err);\r",
-											"    }\r",
-											"    pm.request.body.update({\r",
-											"        mode: 'raw',\r",
-											"        raw: JSON.stringify({}),\r",
-											"        options: { raw: { language: 'json' } }\r",
-											"    });\r",
-											"};\r",
-											"\r",
-											"const interval = setInterval(() => {}, 1000);\r",
-											"\r",
-											"setTimeout(async () => \r",
-											"    {\r",
-											"        try {\r",
-											"            await main();\r",
-											"        } catch (e) {\r",
-											"            console.error(e);\r",
-											"        } finally {\r",
-											"            clearInterval(interval);\r",
-											"        }\r",
-											"    },  \r",
-											"    100 \r",
-											");"
-										],
-										"type": "text/javascript"
-									}
-								},
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"Ответ должен содержать код статуса 400 и данные в формате json\", function () {\r",
-											"    pm.response.to.be.badRequest;    \r",
-											"    pm.response.to.be.withBody;\r",
-											"    pm.response.to.be.json;\r",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "PATCH",
-								"header": [
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									},
-									{
-										"key": "Accept",
-										"value": "application/json"
-									}
-								],
-								"url": {
-									"raw": "{{baseUrl}}/admin/categories/:catId",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"admin",
-										"categories",
-										":catId"
-									],
-									"variable": [
-										{
-											"key": "catId",
-											"value": "{{catid}}"
-										}
-									]
-								},
-								"description": "Обратите внимание: имя категории должно быть уникальным"
-							},
-							"response": []
-						},
-						{
 							"name": "Добавление пользователя с некорректным body",
 							"event": [
 								{
@@ -5835,7 +5746,36 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									""
+									"const main = async () => {\r",
+									"    const api = new API(pm);\r",
+									"    const rnd = new RandomUtils();\r",
+									"\r",
+									"    try {\r",
+									"        const user = await api.addUser(rnd.getUser());\r",
+									"        pm.collectionVariables.set(\"uid\", user.id)\r",
+									"        const category = await api.addCategory(rnd.getCategory());\r",
+									"        let event = await api.addEvent(user.id, rnd.getEvent(category.id));\r",
+									"        event = await api.publishEvent(event.id);\r",
+									"        pm.collectionVariables.set(\"eid\", event.id)\r",
+									"    } catch(err) {\r",
+									"        console.error(\"Ошибка при подготовке тестовых данных.\", err);\r",
+									"    }\r",
+									"};\r",
+									"\r",
+									"const interval = setInterval(() => {}, 1000);\r",
+									"\r",
+									"setTimeout(async () => \r",
+									"    {\r",
+									"        try {\r",
+									"            await main();\r",
+									"        } catch (e) {\r",
+									"            console.error(e);\r",
+									"        } finally {\r",
+									"            clearInterval(interval);\r",
+									"        }\r",
+									"    },  \r",
+									"    100 \r",
+									");"
 								],
 								"type": "text/javascript"
 							}
@@ -5880,7 +5820,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8080/users/:userId/comments?eventId=6",
+							"raw": "http://localhost:8080/users/:userId/comments?eventId={{eid}}",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -5894,13 +5834,13 @@
 							"query": [
 								{
 									"key": "eventId",
-									"value": "6"
+									"value": "{{eid}}"
 								}
 							],
 							"variable": [
 								{
 									"key": "userId",
-									"value": "11"
+									"value": "{{uid}}"
 								}
 							]
 						}
@@ -5975,7 +5915,9 @@
 									"    pm.expect(target.id).to.not.be.null;",
 									"    pm.expect(source.content).equal(target.content, 'Содержимое комментария должно соответствовать отправленному в запросе');",
 									"});",
-									""
+									"pm.collectionVariables.set(\"commentId\", target.id);",
+									"pm.collectionVariables.set(\"authorId\", target.author);",
+									"pm.collectionVariables.set(\"rootEvent\", target.event);"
 								],
 								"type": "text/javascript"
 							}
@@ -6230,7 +6172,7 @@
 							"variable": [
 								{
 									"key": "commentId",
-									"value": "1"
+									"value": "{{commentId}}"
 								}
 							]
 						}
@@ -6247,6 +6189,40 @@
 									"pm.test(\"Ответ должен содержать код статуса 404\", function () {",
 									"    pm.response.to.have.status(404);",
 									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const main = async () => {\r",
+									"    const api = new API(pm);\r",
+									"    const rnd = new RandomUtils();\r",
+									"\r",
+									"    try {\r",
+									"        const user = await api.addUser(rnd.getUser());\r",
+									"        pm.collectionVariables.set(\"uid\", user.id)\r",
+									"    } catch(err) {\r",
+									"        console.error(\"Ошибка при подготовке тестовых данных.\", err);\r",
+									"    }\r",
+									"};\r",
+									"\r",
+									"const interval = setInterval(() => {}, 1000);\r",
+									"\r",
+									"setTimeout(async () => \r",
+									"    {\r",
+									"        try {\r",
+									"            await main();\r",
+									"        } catch (e) {\r",
+									"            console.error(e);\r",
+									"        } finally {\r",
+									"            clearInterval(interval);\r",
+									"        }\r",
+									"    },  \r",
+									"    100 \r",
+									");"
 								],
 								"type": "text/javascript"
 							}
@@ -6271,11 +6247,11 @@
 							"variable": [
 								{
 									"key": "userId",
-									"value": "10"
+									"value": "{{uid}}"
 								},
 								{
 									"key": "commentId",
-									"value": "1"
+									"value": "{{commentId}}"
 								}
 							]
 						}
@@ -6369,11 +6345,11 @@
 							"variable": [
 								{
 									"key": "userId",
-									"value": "190"
+									"value": "{{authorId}}"
 								},
 								{
 									"key": "commentId",
-									"value": "1"
+									"value": "{{commentId}}"
 								}
 							]
 						}
@@ -6441,7 +6417,7 @@
 							"variable": [
 								{
 									"key": "commentId",
-									"value": "1"
+									"value": "{{commentId}}"
 								}
 							]
 						}
@@ -6479,7 +6455,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/comments?eventId=135&sort=CREATE_DATE&from=0&size=15",
+							"raw": "http://localhost:8080/comments?eventId={{rootEvent}}&sort=CREATE_DATE&from=0&size=15",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -6491,7 +6467,7 @@
 							"query": [
 								{
 									"key": "eventId",
-									"value": "135"
+									"value": "{{rootEvent}}"
 								},
 								{
 									"key": "sort",
@@ -6554,7 +6530,7 @@
 							"variable": [
 								{
 									"key": "commentId",
-									"value": "1"
+									"value": "{{commentId}}"
 								}
 							]
 						}
@@ -6568,7 +6544,36 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									""
+									"const main = async () => {\r",
+									"    const api = new API(pm);\r",
+									"    const rnd = new RandomUtils();\r",
+									"\r",
+									"    try {\r",
+									"        const user = await api.addUser(rnd.getUser());\r",
+									"        pm.collectionVariables.set(\"uid\", user.id)\r",
+									"        const category = await api.addCategory(rnd.getCategory());\r",
+									"        let event = await api.addEvent(user.id, rnd.getEvent(category.id));\r",
+									"        event = await api.publishEvent(event.id);\r",
+									"        pm.collectionVariables.set(\"eid\", event.id)\r",
+									"    } catch(err) {\r",
+									"        console.error(\"Ошибка при подготовке тестовых данных.\", err);\r",
+									"    }\r",
+									"};\r",
+									"\r",
+									"const interval = setInterval(() => {}, 1000);\r",
+									"\r",
+									"setTimeout(async () => \r",
+									"    {\r",
+									"        try {\r",
+									"            await main();\r",
+									"        } catch (e) {\r",
+									"            console.error(e);\r",
+									"        } finally {\r",
+									"            clearInterval(interval);\r",
+									"        }\r",
+									"    },  \r",
+									"    100 \r",
+									");"
 								],
 								"type": "text/javascript"
 							}
@@ -6600,7 +6605,9 @@
 									"    pm.expect(target.id).to.not.be.null;",
 									"    pm.expect(source.content).equal(target.content, 'Содержимое комментария должно соответствовать отправленному в запросе');",
 									"});",
-									""
+									"pm.collectionVariables.set(\"comment2\", target.id);",
+									"pm.collectionVariables.set(\"authorId2\", target.author);",
+									"pm.collectionVariables.set(\"rootEvent2\", target.event);"
 								],
 								"type": "text/javascript"
 							}
@@ -6630,7 +6637,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8080/users/:userId/comments?eventId=2",
+							"raw": "http://localhost:8080/users/:userId/comments?eventId={{eid}}",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -6644,13 +6651,13 @@
 							"query": [
 								{
 									"key": "eventId",
-									"value": "2"
+									"value": "{{eid}}"
 								}
 							],
 							"variable": [
 								{
 									"key": "userId",
-									"value": "3"
+									"value": "{{uid}}"
 								}
 							]
 						}
@@ -6702,7 +6709,7 @@
 							"variable": [
 								{
 									"key": "commentId",
-									"value": "1"
+									"value": "{{commentId}}"
 								}
 							]
 						}
@@ -6728,7 +6735,7 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/users/:userId/comments/:commentId?eventId=2",
+							"raw": "http://localhost:8080/users/:userId/comments/:commentId?eventId={{rootEvent2}}",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -6743,17 +6750,17 @@
 							"query": [
 								{
 									"key": "eventId",
-									"value": "2"
+									"value": "{{rootEvent2}}"
 								}
 							],
 							"variable": [
 								{
 									"key": "userId",
-									"value": "3"
+									"value": "{{authorId2}}"
 								},
 								{
 									"key": "commentId",
-									"value": "2"
+									"value": "{{comment2}}"
 								}
 							]
 						}
@@ -6827,7 +6834,9 @@
 									"    pm.expect(target.id).to.not.be.null;",
 									"    pm.expect(source.text).equal(target.text, 'Содержимое комментария должно соответствовать отправленному в запросе');",
 									"});",
-									""
+									"pm.collectionVariables.set(\"comment3\", target.id);",
+									"pm.collectionVariables.set(\"authorId3\", target.author);",
+									"pm.collectionVariables.set(\"rootEvent3\", target.event);"
 								],
 								"type": "text/javascript"
 							}
@@ -6857,7 +6866,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8080/users/:userId/comments?eventId=5",
+							"raw": "http://localhost:8080/users/:userId/comments?eventId={{eid}}",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -6871,13 +6880,13 @@
 							"query": [
 								{
 									"key": "eventId",
-									"value": "5"
+									"value": "{{eid}}"
 								}
 							],
 							"variable": [
 								{
 									"key": "userId",
-									"value": "12"
+									"value": "{{uid}}"
 								}
 							]
 						}
@@ -6945,7 +6954,7 @@
 							"variable": [
 								{
 									"key": "commentId",
-									"value": "3"
+									"value": "{{comment3}}"
 								}
 							]
 						}
@@ -6974,7 +6983,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/comments?eventId=135",
+							"raw": "http://localhost:8080/comments?eventId={{rootEvent}}",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -7001,7 +7010,7 @@
 								},
 								{
 									"key": "eventId",
-									"value": "135"
+									"value": "{{rootEvent}}"
 								}
 							]
 						}
@@ -7263,6 +7272,42 @@
 			"key": "comid",
 			"value": "1",
 			"type": "string"
+		},
+		{
+			"key": "commentId",
+			"value": ""
+		},
+		{
+			"key": "authorId",
+			"value": ""
+		},
+		{
+			"key": "rootEvent",
+			"value": ""
+		},
+		{
+			"key": "comment2",
+			"value": ""
+		},
+		{
+			"key": "authorId2",
+			"value": ""
+		},
+		{
+			"key": "rootEvent2",
+			"value": ""
+		},
+		{
+			"key": "comment3",
+			"value": ""
+		},
+		{
+			"key": "authorId3",
+			"value": ""
+		},
+		{
+			"key": "rootEvent3",
+			"value": ""
 		}
 	]
 }
