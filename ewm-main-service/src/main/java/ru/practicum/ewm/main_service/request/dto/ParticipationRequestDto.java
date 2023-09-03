@@ -1,4 +1,4 @@
-package ru.practicum.ewm.common_dto;
+package ru.practicum.ewm.main_service.request.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
@@ -6,32 +6,23 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import ru.practicum.ewm.main_service.request.enums.RequestStatus;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Getter
 @Builder
 @EqualsAndHashCode
-@NoArgsConstructor(force = true)
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public final class EndpointHitDto {
+public final class ParticipationRequestDto {
 
-    @NotBlank
-    String app;
-
-    @NotBlank
-    String uri;
-
-    @NotBlank
-    String ip;
-
-    @NotNull
+    Long id;
+    Long requester;
+    Long event;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-    LocalDateTime timestamp;
+    LocalDateTime created;
+    RequestStatus status;
 
 }

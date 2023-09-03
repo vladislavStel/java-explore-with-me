@@ -1,23 +1,20 @@
-package ru.practicum.ewm.common_dto;
+package ru.practicum.ewm.main_service.location.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 @Getter
 @Builder
 @EqualsAndHashCode
-@NoArgsConstructor(force = true)
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public final class ViewStatDto {
+public final class LocationDto {
 
-    String app;
-    String uri;
-    long hits;
+    float lat;
+    float lon;
 
 }

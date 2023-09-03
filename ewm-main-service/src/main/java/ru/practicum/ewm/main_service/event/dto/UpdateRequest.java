@@ -1,23 +1,27 @@
-package ru.practicum.ewm.common_dto;
+package ru.practicum.ewm.main_service.event.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @Getter
 @Builder
 @EqualsAndHashCode
-@NoArgsConstructor(force = true)
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public final class ViewStatDto {
+public final class UpdateRequest {
 
-    String app;
-    String uri;
-    long hits;
+    @NotNull
+    List<Long> requestIds;
+
+    @NotBlank
+    String status;
 
 }
