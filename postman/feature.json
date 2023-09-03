@@ -4,7 +4,7 @@
 		"name": "Test Explore With Me - Feature comments",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "26332562",
-		"_collection_link": "https://lunar-comet-8254.postman.co/workspace/62acaeab-88d0-4980-8a9e-3b3e36bb0443/collection/26332562-b6a78f4b-1c3f-4ee2-a64e-03d6893038a7?action=share&source=collection_link&creator=26332562"
+		"_collection_link": "https://lunar-comet-8254.postman.co/workspace/Team-Workspace~62acaeab-88d0-4980-8a9e-3b3e36bb0443/collection/26332562-b6a78f4b-1c3f-4ee2-a64e-03d6893038a7?action=share&source=collection_link&creator=26332562"
 	},
 	"item": [
 		{
@@ -5724,554 +5724,6 @@
 			]
 		},
 		{
-			"name": "Compilation",
-			"item": [
-				{
-					"name": "Добавление новой подборки",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									"const main = async () => {\r",
-									"    const api = new API(pm);\r",
-									"    const rnd = new RandomUtils();\r",
-									"\r",
-									"    let compilation;\r",
-									"    try {\r",
-									"        const user = await api.addUser(rnd.getUser());\r",
-									"        const category = await api.addCategory(rnd.getCategory());\r",
-									"        const event = await api.addEvent(user.id, rnd.getEvent(category.id));\r",
-									"        compilation = rnd.getCompilation(event.id);\r",
-									"    } catch(err) {\r",
-									"        console.error(\"Ошибка при подготовке тестовых данных.\", err);\r",
-									"    }\r",
-									"\r",
-									"    pm.request.body.update({\r",
-									"        mode: 'raw',\r",
-									"        raw: JSON.stringify(compilation),\r",
-									"        options: { raw: { language: 'json' } }\r",
-									"    });\r",
-									"};\r",
-									"\r",
-									"const interval = setInterval(() => {}, 1000);\r",
-									"\r",
-									"setTimeout(async () => \r",
-									"    {\r",
-									"        try {\r",
-									"            await main();\r",
-									"        } catch (e) {\r",
-									"            console.error(e);\r",
-									"        } finally {\r",
-									"            clearInterval(interval);\r",
-									"        }\r",
-									"    },  \r",
-									"    100 \r",
-									");"
-								],
-								"type": "text/javascript"
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Ответ должен содержать код статуса 201 и данные в формате json\", function () {\r",
-									"    pm.response.to.have.status(201);\r",
-									"    pm.response.to.be.withBody;\r",
-									"    pm.response.to.be.json;\r",
-									"});\r",
-									"\r",
-									"const source = JSON.parse(pm.request.body.raw);\r",
-									"const target = pm.response.json();\r",
-									"\r",
-									"pm.test(\"Подборка должны содержать поля: id, title, pinned, events\", function () {\r",
-									"pm.expect(target).to.have.property('id');\r",
-									"pm.expect(target).to.have.property('title');\r",
-									"pm.expect(target).to.have.property('pinned');\r",
-									"pm.expect(target).to.have.property('events');\r",
-									"});\r",
-									"\r",
-									"pm.test(\"Данные в ответе должны соответствовать данным в запросе\", function () {\r",
-									"    pm.expect(target.id).to.not.be.null;\r",
-									"    pm.expect(target.title).to.be.a(\"string\");\r",
-									"    pm.expect(target.events).to.be.an(\"array\");\r",
-									"\r",
-									"    pm.expect(source.events[0]).equal(target.events[0].id, 'Идентификаторы событий в подборке должен быть идентичен идентификаторам, указанным при создании подборки ');\r",
-									"    pm.expect(source.title).equal(target.title, 'Название подборки должно соответствовать указанному при создании');\r",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Accept",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}/admin/compilations",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"admin",
-								"compilations"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Получение подборки событий по id",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									"const main = async () => {\r",
-									"    const api = new API(pm);\r",
-									"    const rnd = new RandomUtils();\r",
-									"\r",
-									"    try {\r",
-									"        const user = await api.addUser(rnd.getUser());\r",
-									"        const category = await api.addCategory(rnd.getCategory());\r",
-									"        const compilation = await api.addCompilation(rnd.getCompilation());\r",
-									"        pm.collectionVariables.set('response', compilation);\r",
-									"        pm.collectionVariables.set('compid', compilation.id);\r",
-									"    } catch(err) {\r",
-									"        console.error(\"Ошибка при подготовке тестовых данных.\", err);\r",
-									"    }\r",
-									"};\r",
-									"\r",
-									"const interval = setInterval(() => {}, 1000);\r",
-									"\r",
-									"setTimeout(async () => \r",
-									"    {\r",
-									"        try {\r",
-									"            // выполняем наш скрипт\r",
-									"            await main();\r",
-									"        } catch (e) {\r",
-									"            console.error(e);\r",
-									"        } finally {\r",
-									"            clearInterval(interval);\r",
-									"        }\r",
-									"    },  \r",
-									"    100 \r",
-									");"
-								],
-								"type": "text/javascript"
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Ответ должен содержать код статуса 200 и данные в формате json\", function () {\r",
-									"    pm.response.to.be.ok;    \r",
-									"    pm.response.to.be.withBody;\r",
-									"    pm.response.to.be.json;\r",
-									"});\r",
-									"\r",
-									"const source = pm.collectionVariables.get('response');\r",
-									"const target = pm.response.json();\r",
-									"\r",
-									"pm.test(\"Подборка должны содержать поля: id, title, pinned, events\", function () {\r",
-									"pm.expect(target).to.have.property('id');\r",
-									"pm.expect(target).to.have.property('title');\r",
-									"pm.expect(target).to.have.property('pinned');\r",
-									"pm.expect(target).to.have.property('events');\r",
-									"});\r",
-									"\r",
-									"pm.test(\"Данные в ответе должны соответствовать данным в запросе\", function () {\r",
-									"    pm.expect(source.id).equal(target.id, 'Идентификатор подборки должен соответствовать идентификатору подборки добавленной ранее');\r",
-									"    pm.expect(source.title).equal(target.title, 'Название подборки должно соответствовать названию подборки добавленной ранее');\r",
-									"    pm.expect(source.pinned).equal(target.pinned, 'Закреплённость подборки должна соответствовать закреплённости подборки добавленной ранее');\r",
-									"    pm.expect(source.events.join()).equal(target.events.join(), 'События подборки должны соответствовать событиям подборки добавленной ранее');\r",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Accept",
-								"value": "application/json"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/compilations/:compId",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"compilations",
-								":compId"
-							],
-							"variable": [
-								{
-									"key": "compId",
-									"value": "{{compid}}",
-									"description": "(Required) id подборки"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Получение подборок событий",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									"const main = async () => {\r",
-									"    const api = new API(pm);\r",
-									"    const rnd = new RandomUtils();\r",
-									"\r",
-									"    try {\r",
-									"        const user = await api.addUser(rnd.getUser());\r",
-									"        const category = await api.addCategory(rnd.getCategory());\r",
-									"        let newComp = rnd.getCompilation();\r",
-									"        newComp['pinned'] = true;\r",
-									"        const compilation = await api.addCompilation(newComp);\r",
-									"        pm.collectionVariables.set('response', compilation);\r",
-									"    } catch(err) {\r",
-									"        console.error(\"Ошибка при подготовке тестовых данных.\", err);\r",
-									"    }\r",
-									"};\r",
-									"\r",
-									"const interval = setInterval(() => {}, 1000);\r",
-									"\r",
-									"setTimeout(async () => \r",
-									"    {\r",
-									"        try {\r",
-									"            // выполняем наш скрипт\r",
-									"            await main();\r",
-									"        } catch (e) {\r",
-									"            console.error(e);\r",
-									"        } finally {\r",
-									"            clearInterval(interval);\r",
-									"        }\r",
-									"    },  \r",
-									"    100 \r",
-									");"
-								],
-								"type": "text/javascript"
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Ответ должен содержать код статуса 200 и данные в формате json\", function () {\r",
-									"    pm.response.to.be.ok;    \r",
-									"    pm.response.to.be.withBody;\r",
-									"    pm.response.to.be.json;\r",
-									"});\r",
-									"\r",
-									"const source = pm.collectionVariables.get('response');\r",
-									"const target = pm.response.json();\r",
-									"let founded;\r",
-									"target.forEach(function(element){if (element.id == source.id) founded = element});\r",
-									"\r",
-									"pm.test(\"Подборка должны содержать поля: id, title, pinned, events\", function () {\r",
-									"pm.expect(target[0]).to.have.property('id');\r",
-									"pm.expect(target[0]).to.have.property('title');\r",
-									"pm.expect(target[0]).to.have.property('pinned');\r",
-									"pm.expect(target[0]).to.have.property('events');\r",
-									"});\r",
-									"\r",
-									"pm.test(\"Данные в ответе должны соответствовать данным в запросе\", function () {\r",
-									"    pm.expect(source.id).equal(founded.id, 'Идентификатор подборки должен соответствовать идентификатору подборки добавленной ранее');\r",
-									"    pm.expect(source.title).equal(founded.title, 'Название подборки должно соответствовать названию подборки добавленной ранее');\r",
-									"    pm.expect(source.pinned).equal(founded.pinned, 'Закрепленность подборки должна соответствовать закрепленности подборки добавленной ранее');\r",
-									"    pm.expect(source.events.join()).equal(founded.events.join(), 'События подборки должны соответствовать событиям подборки добавленной ранее');\r",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Accept",
-								"value": "application/json"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/compilations?pinned=true&from=0&size=1000",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"compilations"
-							],
-							"query": [
-								{
-									"key": "pinned",
-									"value": "true",
-									"description": "искать только закрепленные/не закрепленные подборки"
-								},
-								{
-									"key": "from",
-									"value": "0",
-									"description": "количество элементов, которые нужно пропустить для формирования текущего набора"
-								},
-								{
-									"key": "size",
-									"value": "1000",
-									"description": "количество элементов в наборе"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Удаление подборки",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Ответ должен содержать код статуса 204\", function () {\r",
-									"    pm.response.to.have.status(204);\r",
-									"});\r",
-									"\r",
-									"let source = pm.collectionVariables.get('response');\r",
-									"\r",
-									"pm.test(\"Подборка должна быть найдена до удаления\", function () {\r",
-									"    pm.expect(source).not.to.be.null;\r",
-									"});\r",
-									"\r",
-									"let body\r",
-									"const req = {\r",
-									"                url: \"http://localhost:8080/compilations?from=0&size=1000\" + pm.collectionVariables.get(\"uid\"),\r",
-									"                method: \"GET\",\r",
-									"                body: body == null ? \"\" : JSON.stringify(body),\r",
-									"                header: { \"Content-Type\": \"application/json\" },\r",
-									"            };\r",
-									"pm.sendRequest(req, (error, response) => {\r",
-									"    pm.test(\"Подборка должна быть удалена после выполнения запроса\", function(){\r",
-									"        response.json().forEach(element => {\r",
-									"            if(element.id == pm.collectionVariables.get('compid')){\r",
-									"                throw new Error(\"Подборка все еще находится в списке существующих\");\r",
-									"            }\r",
-									"        })\r",
-									"    });\r",
-									"})\r",
-									""
-								],
-								"type": "text/javascript"
-							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									"const main = async () => {\r",
-									"    const api = new API(pm);\r",
-									"    const rnd = new RandomUtils();\r",
-									"\r",
-									"    try {\r",
-									"        const user = await api.addUser(rnd.getUser());\r",
-									"        const category = await api.addCategory(rnd.getCategory());\r",
-									"        const compilation = await api.addCompilation(rnd.getCompilation());\r",
-									"        const foundedCompilation = await api.findCompilation(compilation.id);\r",
-									"        pm.collectionVariables.set('compid', compilation.id);\r",
-									"        pm.collectionVariables.set('response', foundedCompilation);\r",
-									"    } catch(err) {\r",
-									"        console.error(\"Ошибка при подготовке тестовых данных.\", err);\r",
-									"    }\r",
-									"};\r",
-									"\r",
-									"const interval = setInterval(() => {}, 1000);\r",
-									"\r",
-									"setTimeout(async () => \r",
-									"    {\r",
-									"        try {\r",
-									"            // выполняем наш скрипт\r",
-									"            await main();\r",
-									"        } catch (e) {\r",
-									"            console.error(e);\r",
-									"        } finally {\r",
-									"            clearInterval(interval);\r",
-									"        }\r",
-									"    },  \r",
-									"    100 \r",
-									");"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "DELETE",
-						"header": [
-							{
-								"key": "Accept",
-								"value": "application/json"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/admin/compilations/:compId",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"admin",
-								"compilations",
-								":compId"
-							],
-							"variable": [
-								{
-									"key": "compId",
-									"value": "{{compid}}",
-									"description": "(Required) id подборки"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Обновить информацию о подборке",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									"const main = async () => {\r",
-									"    const api = new API(pm);\r",
-									"    const rnd = new RandomUtils();\r",
-									"\r",
-									"    try {\r",
-									"        const user = await api.addUser(rnd.getUser());\r",
-									"        const category = await api.addCategory(rnd.getCategory());\r",
-									"        let event = await api.addEvent(user.id, rnd.getEvent(category.id));\r",
-									"        event = await api.publishEvent(event.id);\r",
-									"        const compilation = await api.addCompilation(rnd.getCompilation());\r",
-									"        const foundedCompilation = await api.findCompilation(compilation.id);\r",
-									"        pm.collectionVariables.set('compid', compilation.id);\r",
-									"        pm.collectionVariables.set('response', foundedCompilation);\r",
-									"        pm.collectionVariables.set('eid', event.id);\r",
-									"        pm.request.body.update({\r",
-									"            mode: 'raw',\r",
-									"            raw: JSON.stringify({\r",
-									"                events : [event.id],\r",
-									"                pinned: true,\r",
-									"                title: rnd.getCompilation().name\r",
-									"            }),\r",
-									"            options: { raw: { language: 'json' } }\r",
-									"        });\r",
-									"    } catch(err) {\r",
-									"        console.error(\"Ошибка при подготовке тестовых данных.\", err);\r",
-									"    }\r",
-									"};\r",
-									"\r",
-									"const interval = setInterval(() => {}, 1000);\r",
-									"\r",
-									"setTimeout(async () => \r",
-									"    {\r",
-									"        try {\r",
-									"            // выполняем наш скрипт\r",
-									"            await main();\r",
-									"        } catch (e) {\r",
-									"            console.error(e);\r",
-									"        } finally {\r",
-									"            clearInterval(interval);\r",
-									"        }\r",
-									"    },  \r",
-									"    100 \r",
-									");"
-								],
-								"type": "text/javascript"
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Ответ должен содержать код статуса 200\", function () {\r",
-									"    pm.response.to.be.ok;    \r",
-									"});\r",
-									"\r",
-									"source = pm.collectionVariables.get('response');\r",
-									"compId = pm.collectionVariables.get('compid');\r",
-									"eventId = pm.collectionVariables.get('eid');\r",
-									"\r",
-									"pm.test(\"Событие не должно быть найдено в подборке до добавления\", function () {\r",
-									"    pm.expect(source.events.length).equal(0);\r",
-									"});\r",
-									"\r",
-									"pm.sendRequest({\r",
-									"            url: pm.collectionVariables.get(\"baseUrl\") + \"/compilations/\" + compId,\r",
-									"            method: 'GET',\r",
-									"        }, (error, response) => {\r",
-									"            \r",
-									"            pm.test(\"Событие должно быть найдено в подборке после добавления\", function () {\r",
-									"                pm.expect(response.json().events[0].id).equal(eventId);\r",
-									"            });\r",
-									"        });"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "PATCH",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{{request_body}}"
-						},
-						"url": {
-							"raw": "{{baseUrl}}/admin/compilations/:compId",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"admin",
-								"compilations",
-								":compId"
-							],
-							"variable": [
-								{
-									"key": "compId",
-									"value": "{{compid}}"
-								}
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
 			"name": "Comments",
 			"item": [
 				{
@@ -6831,7 +6283,7 @@
 					"response": []
 				},
 				{
-					"name": "Изменение комментария текущим пользователем 1",
+					"name": "Изменение комментария текущим пользователем",
 					"event": [
 						{
 							"listen": "prerequest",
@@ -6917,7 +6369,7 @@
 							"variable": [
 								{
 									"key": "userId",
-									"value": "65"
+									"value": "190"
 								},
 								{
 									"key": "commentId",
@@ -7027,7 +6479,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/comments?eventId=36&sort=CREATE_DATE&from=0&size=15",
+							"raw": "http://localhost:8080/comments?eventId=135&sort=CREATE_DATE&from=0&size=15",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -7039,7 +6491,7 @@
 							"query": [
 								{
 									"key": "eventId",
-									"value": "36"
+									"value": "135"
 								},
 								{
 									"key": "sort",
@@ -7059,7 +6511,7 @@
 					"response": []
 				},
 				{
-					"name": "Модерация комментария админом с некорректным body",
+					"name": "Модерация комментария админом с некорректным Body",
 					"event": [
 						{
 							"listen": "test",
@@ -7178,7 +6630,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8080/users/:userId/comments?eventId=3",
+							"raw": "http://localhost:8080/users/:userId/comments?eventId=2",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -7192,13 +6644,13 @@
 							"query": [
 								{
 									"key": "eventId",
-									"value": "3"
+									"value": "2"
 								}
 							],
 							"variable": [
 								{
 									"key": "userId",
-									"value": "6"
+									"value": "3"
 								}
 							]
 						}
@@ -7276,7 +6728,7 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/users/:userId/comments/:commentId?eventId=3",
+							"raw": "http://localhost:8080/users/:userId/comments/:commentId?eventId=2",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -7291,13 +6743,13 @@
 							"query": [
 								{
 									"key": "eventId",
-									"value": "3"
+									"value": "2"
 								}
 							],
 							"variable": [
 								{
 									"key": "userId",
-									"value": "6"
+									"value": "3"
 								},
 								{
 									"key": "commentId",
@@ -7405,7 +6857,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8080/users/:userId/comments?eventId=13",
+							"raw": "http://localhost:8080/users/:userId/comments?eventId=5",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -7419,13 +6871,13 @@
 							"query": [
 								{
 									"key": "eventId",
-									"value": "13"
+									"value": "5"
 								}
 							],
 							"variable": [
 								{
 									"key": "userId",
-									"value": "21"
+									"value": "12"
 								}
 							]
 						}
@@ -7522,7 +6974,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/comments?eventId=36",
+							"raw": "http://localhost:8080/comments?eventId=135",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -7549,7 +7001,7 @@
 								},
 								{
 									"key": "eventId",
-									"value": "36"
+									"value": "135"
 								}
 							]
 						}
